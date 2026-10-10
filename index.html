@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hide and Seek Monster — Minecraft Bedrock</title>
+  <meta name="description" content="Add-on de terror para Minecraft Bedrock: escondidas nocturnas, barra de cerebro, ruinas, trampas de oso y jefe final." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0612;
+      --bg2: #140a1f;
+      --card: #1a1028;
+      --purple: #9b5de5;
+      --pink: #f15bb5;
+      --red: #e02040;
+      --cyan: #00f5d4;
+      --gold: #ffd166;
+      --text: #f0e6ff;
+      --muted: #a89bb8;
+      --border: rgba(155, 93, 229, 0.25);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Outfit", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .bg-glow {
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(155,93,229,.28), transparent),
+        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(224,32,64,.14), transparent),
+        radial-gradient(ellipse 40% 30% at 50% 100%, rgba(0,245,212,.06), transparent),
+        var(--bg);
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(14px);
+      background: rgba(10,6,18,.8);
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 1.4rem;
+      display: flex; flex-wrap: wrap; gap: .8rem;
+      align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-family: "Creepster", cursive;
+      font-size: 1.45rem;
+      color: var(--red);
+      text-decoration: none;
+      text-shadow: 0 0 18px rgba(224,32,64,.45);
+    }
+    .nav-links { display: flex; flex-wrap: wrap; gap: .3rem 1rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--cyan); }
+
+    header.hero {
+      max-width: 1100px; margin: 0 auto;
+      padding: 3.5rem 1.4rem 2.5rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: .35rem .9rem;
+      border-radius: 999px;
+      background: rgba(155,93,229,.18);
+      border: 1px solid var(--border);
+      color: var(--purple);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+    }
+    h1 {
+      font-family: "Creepster", cursive;
+      font-size: clamp(2.3rem, 7vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: .9rem;
+      text-shadow: 0 0 36px rgba(155,93,229,.35);
+    }
+    h1 span { color: var(--red); }
+    .lead {
+      max-width: 640px; margin: 0 auto 1.8rem;
+      color: var(--muted); font-size: 1.12rem;
+    }
+    .hero-cta { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .85rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600; font-size: .98rem;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform .15s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--red), #a01030);
+      color: #fff;
+      box-shadow: 0 8px 28px rgba(224,32,64,.35);
+    }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    section {
+      max-width: 1100px; margin: 0 auto;
+      padding: 2.8rem 1.4rem;
+    }
+    h2 { font-size: 1.75rem; margin-bottom: .4rem; }
+    .section-sub { color: var(--muted); margin-bottom: 1.6rem; max-width: 560px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.15rem;
+    }
+    .card {
+      background: linear-gradient(160deg, var(--card), var(--bg2));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.35rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .card:hover { border-color: rgba(155,93,229,.5); transform: translateY(-3px); }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; margin-bottom: .85rem;
+      background: rgba(155,93,229,.15);
+    }
+    .card h3 { font-size: 1.08rem; margin-bottom: .35rem; }
+    .card p { color: var(--muted); font-size: .93rem; }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.15rem;
+    }
+    .shot {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+    .shot:hover { transform: translateY(-3px); border-color: rgba(155,93,229,.5); }
+    .shot img {
+      width: 100%; height: 210px;
+      object-fit: cover; display: block; background: #0d0814;
+    }
+    .shot figcaption {
+      padding: .85rem 1.05rem 1.05rem;
+      color: var(--muted); font-size: .88rem;
+    }
+    .shot figcaption strong {
+      display: block; color: var(--text); margin-bottom: .2rem; font-size: .98rem;
+    }
+
+    .story {
+      background: linear-gradient(145deg, rgba(224,32,64,.1), rgba(155,93,229,.12));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem 1.6rem;
+    }
+    .story p { color: var(--muted); margin-bottom: 1rem; }
+    .story p:last-child { margin-bottom: 0; }
+    .story strong { color: var(--gold); }
+
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    .item-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem;
+      text-align: center;
+    }
+    .item-card img {
+      width: 64px; height: 64px;
+      image-rendering: pixelated;
+      margin: 0 auto .7rem;
+      display: block;
+      background: #0d0814;
+      border-radius: 8px;
+      padding: 6px;
+    }
+    .item-card h3 { font-size: .95rem; margin-bottom: .25rem; }
+    .item-card p { color: var(--muted); font-size: .8rem; }
+    .item-card code { color: var(--cyan); font-size: .72rem; }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      border-left: 2px solid var(--border);
+      display: flex; flex-direction: column; gap: 1.25rem;
+    }
+    .step {
+      position: relative;
+      padding: 1.15rem 1.35rem;
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+    .step::before {
+      content: attr(data-n);
+      position: absolute;
+      left: -2.65rem; top: 1.15rem;
+      width: 1.7rem; height: 1.7rem;
+      border-radius: 50%;
+      background: var(--red); color: #fff;
+      font-weight: 700; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 14px rgba(224,32,64,.45);
+    }
+    .step h3 { color: var(--gold); margin-bottom: .3rem; }
+    .step p { color: var(--muted); font-size: .93rem; }
+
+    .download-box {
+      margin-top: 1.4rem;
+      padding: 1.4rem;
+      border-radius: 16px;
+      border: 1px solid rgba(224,32,64,.35);
+      background: linear-gradient(135deg, rgba(224,32,64,.12), rgba(155,93,229,.12));
+      display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    .download-box p { color: var(--muted); max-width: 480px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .93rem; margin-top: .8rem; }
+    th, td { text-align: left; padding: .7rem .9rem; border-bottom: 1px solid var(--border); }
+    th { color: var(--purple); background: rgba(155,93,229,.08); }
+    code, .cmd {
+      font-family: ui-monospace, monospace;
+      background: rgba(0,0,0,.4);
+      padding: .12rem .4rem;
+      border-radius: 6px;
+      font-size: .86em;
+      color: var(--cyan);
+    }
+    .cmd-block {
+      background: #0d0814;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem 1.15rem;
+      font-family: ui-monospace, monospace;
+      color: var(--cyan);
+      margin: .6rem 0;
+      overflow-x: auto;
+      font-size: .88rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 1.4rem;
+      color: var(--muted);
+      font-size: .88rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <nav>
+    <a class="logo" href="#">Hide &amp; Seek Monster</a>
+    <ul class="nav-links">
+      <li><a href="#historia">Historia</a></li>
+      <li><a href="#capturas">Capturas</a></li>
+      <li><a href="#juego">Juego</a></li>
+      <li><a href="#items">Ítems</a></li>
+      <li><a href="#funciones">Funciones</a></li>
+      <li><a href="#instalar">Instalar</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <div class="badge">Minecraft Bedrock · Add-on v1.10</div>
+    <h1>Hide and Seek <span>Monster</span></h1>
+    <p class="lead">
+      De noche cae la oscuridad… y con ella un monstruo que juega a las escondidas.
+      Escóndete, sobrevive, saquea ruinas y usa trampas de oso. Tu cerebro no aguantará para siempre.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="downloads/HideAndSeekMonster.mcaddon" download="HideAndSeekMonster.mcaddon">⬇ Descargar .mcaddon</a>
+      <a class="btn btn-secondary" href="#capturas">Ver capturas</a>
+      <a class="btn btn-secondary" href="#historia">Leer la historia</a>
+    </div>
+  </header>
+
+  <!-- HISTORIA -->
+  <section id="historia">
+    <h2>📜 Historia del mod</h2>
+    <p class="section-sub">El lore detrás de las escondidas.</p>
+    <div class="story">
+      <p>
+        Nadie recuerda cuándo empezó el juego. Solo que, cuando el sol se oculta,
+        algo sale del bosque y <strong>cuenta hasta treinta</strong>.
+      </p>
+      <p>
+        No es un zombi. No es un enderman. Es una sombra con ojos rojos que
+        <strong>rastrea tus pasos</strong>, rompe lo que se interpone y se ríe en silencio
+        cuando te encuentra. Si logras sobrevivir un minuto entero, te recompensa…
+        y promete volver <strong>la noche siguiente</strong>.
+      </p>
+      <p>
+        Los supervivientes dejaron <strong>ruinas abandonadas</strong> con cofres de hierro,
+        redstone y lapislázuli. También inventaron <strong>trampas de oso</strong>:
+        si el monstruo pisa una, queda atrapado cinco segundos. Un respiro… o una trampa mortal.
+      </p>
+      <p>
+        Cada partida desgasta la <strong>barra de cerebro</strong>. Comes y duermes para recuperarla.
+        Si llega a cero, las náuseas te consumen y, al final, la mente se apaga.
+      </p>
+      <p>
+        Quien aguanta <strong>diez noches</strong> despierta algo peor: el
+        <strong>Jefe de las Escondidas</strong>. Más grande, más fuerte, y capaz de
+        teletransportarse a tu lado. Derrotarlo es la única forma de callar el juego… por un tiempo.
+      </p>
+      <p>
+        <em>§7«Gracias por jugar mi juego… nos vemos la próxima noche.»</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- CAPTURAS -->
+  <section id="capturas">
+    <h2>📷 Capturas del juego</h2>
+    <p class="section-sub">Imágenes reales del add-on en Minecraft Bedrock.</p>
+    <div class="gallery">
+      <figure class="shot">
+        <img src="images/shot_monster_close.jpg" alt="Monstruo de cerca con ojos rojos" loading="lazy" />
+        <figcaption>
+          <strong>El monstruo de cerca</strong>
+          Textura oscura, ojos rojos y colmillos. La cacería ya empezó.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/shot_found_you.jpg" alt="Mensaje TE ENCONTRÉ y monstruo al fondo" loading="lazy" />
+        <figcaption>
+          <strong>¡TE ENCONTRÉ!</strong>
+          Termina el tiempo de esconderse. 60 segundos para sobrevivir.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/shot_beach_spawn.jpg" alt="Monstruo aparece en la playa de noche" loading="lazy" />
+        <figcaption>
+          <strong>Aparición nocturna</strong>
+          El monstruo surge cerca del jugador. Tienes 30 segundos para esconderte.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/shot_night_starts.jpg" alt="Mensaje la noche cae" loading="lazy" />
+        <figcaption>
+          <strong>La noche cae</strong>
+          El juego de las escondidas puede comenzar.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/shot_countdown.jpg" alt="Cuenta regresiva y barra de cerebro" loading="lazy" />
+        <figcaption>
+          <strong>Cuenta regresiva + cerebro</strong>
+          Mensajes en el chat y barra de cerebro en la action bar.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="images/pack_icon.png" alt="Icono del pack" loading="lazy" style="object-fit:contain;background:#1a1028;padding:2rem;height:210px;" />
+        <figcaption>
+          <strong>Icono del pack</strong>
+          Steve escondido del monstruo bajo la luna.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CÓMO SE JUEGA -->
+  <section id="juego">
+    <h2>🎮 Cómo se juega</h2>
+    <p class="section-sub">El ciclo de una noche de escondidas.</p>
+    <div class="timeline">
+      <div class="step" data-n="1">
+        <h3>Cae la noche</h3>
+        <p>Aparece <strong>un solo monstruo</strong> cerca. Suena el ambiente de terror.</p>
+      </div>
+      <div class="step" data-n="2">
+        <h3>30 segundos para esconderte</h3>
+        <p>Cuenta regresiva en el chat. Busca ruinas, coloca trampas, apaga luces… o corre.</p>
+      </div>
+      <div class="step" data-n="3">
+        <h3>¡TE ENCONTRÉ!</h3>
+        <p>60 segundos de cacería: rastrea pasos, rompe bloques blandos, pega ½ corazón por golpe.</p>
+      </div>
+      <div class="step" data-n="4">
+        <h3>Si sobrevives</h3>
+        <p>10 diamantes, −20 de cerebro, mensaje del monstruo y <strong>se hace de día</strong>. +1 noche al contador.</p>
+      </div>
+      <div class="step" data-n="5">
+        <h3>Diez noches → Jefe</h3>
+        <p>El Jefe de las Escondidas aparece a tu lado. 200 de vida. Al derrotarlo: 20 diamantes + 2 netherita.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÍTEMS Y HUEVOS -->
+  <section id="items">
+    <h2>🎒 Ítems, bloques y huevos de spawn</h2>
+    <p class="section-sub">Texturas del Resource Pack.</p>
+    <div class="item-grid">
+      <div class="item-card">
+        <img src="images/tex_monster.png" alt="Textura del monstruo" />
+        <h3>Monstruo</h3>
+        <p>Textura de entidad<br /><code>hide:seek_monster</code></p>
+      </div>
+      <div class="item-card">
+        <img src="images/egg_monster.png" alt="Huevo monstruo" />
+        <h3>Huevo monstruo</h3>
+        <p>Morado y ojos rojos<br /><code>spawn egg</code></p>
+      </div>
+      <div class="item-card">
+        <img src="images/egg_boss.png" alt="Huevo jefe" />
+        <h3>Huevo jefe</h3>
+        <p>Negro, corona dorada<br /><code>hide:boss_monster</code></p>
+      </div>
+      <div class="item-card">
+        <img src="images/item_lantern.png" alt="Linterna" />
+        <h3>Linterna</h3>
+        <p>Luz para la noche<br /><code>hide:lantern</code></p>
+      </div>
+      <div class="item-card">
+        <img src="images/item_trap.png" alt="Trampa de oso ítem" />
+        <h3>Trampa de oso</h3>
+        <p>Ítem colocable<br /><code>hide:bear_trap_item</code></p>
+      </div>
+      <div class="item-card">
+        <img src="images/block_trap.png" alt="Bloque trampa" />
+        <h3>Bloque trampa</h3>
+        <p>Atrapa 5 segundos<br /><code>hide:bear_trap</code></p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Elemento</th><th>ID</th><th>Uso</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Monstruo</td>
+          <td><code>hide:seek_monster</code></td>
+          <td>1 por noche · escondidas + cacería</td>
+        </tr>
+        <tr>
+          <td>Jefe</td>
+          <td><code>hide:boss_monster</code></td>
+          <td>Tras 10 noches · 200 HP · se teletransporta</td>
+        </tr>
+        <tr>
+          <td>Linterna</td>
+          <td><code>hide:lantern</code></td>
+          <td>Coloca luz</td>
+        </tr>
+        <tr>
+          <td>Trampa de oso</td>
+          <td><code>hide:bear_trap_item</code></td>
+          <td>Colócala; el monstruo queda quieto 5 s</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FUNCIONES -->
+  <section id="funciones">
+    <h2>✨ Funciones del mod</h2>
+    <div class="grid">
+      <article class="card">
+        <div class="card-icon">🌙</div>
+        <h3>Solo de noche</h3>
+        <p>1 monstruo por noche. Al terminar la partida se hace de día.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">🧠</div>
+        <h3>Barra de cerebro</h3>
+        <p>Baja al terminar escondidas (−20). Sube comiendo (+12) y durmiendo (+25). A 0: náuseas y muerte.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">🏚️</div>
+        <h3>Ruinas abandonadas</h3>
+        <p>Edificios rotos con cofres: hierro, redstone, lapislázuli y a veces trampas.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">🐻</div>
+        <h3>Trampas de oso</h3>
+        <p>El monstruo o el jefe se quedan quietos 5 segundos al pisarlas.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">👣</div>
+        <h3>Rastro de pasos</h3>
+        <p>Sigue donde caminaste y rompe bloques blandos para alcanzarte.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">🔊</div>
+        <h3>Audio de terror</h3>
+        <p>Respiración, caza, teletransporte y música. Se detiene al desaparecer el monstruo.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">🎬</div>
+        <h3>Animaciones</h3>
+        <p>Aparición, caminar, golpear y teletransporte (monstruo y jefe).</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">👹</div>
+        <h3>Jefe final</h3>
+        <p>Desbloqueado a las 10 noches. Recompensa: diamantes y netherita.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- INSTALAR -->
+  <section id="instalar">
+    <h2>📦 Instalar</h2>
+    <p class="section-sub">Minecraft Bedrock (móvil, Windows, consolas con add-ons).</p>
+    <div class="download-box">
+      <div>
+        <h3 style="margin-bottom:.3rem;">HideAndSeekMonster.mcaddon</h3>
+        <p>Versión 1.10 · Behavior Pack + Resource Pack. Ruinas, trampas, terror y jefe.</p>
+      </div>
+      <a class="btn btn-primary" href="downloads/HideAndSeekMonster.mcaddon" download="HideAndSeekMonster.mcaddon">⬇ Descargar ahora</a>
+    </div>
+    <div class="timeline" style="margin-top:1.5rem;">
+      <div class="step" data-n="1"><h3>Descarga</h3><p>El archivo <code>.mcaddon</code> de arriba.</p></div>
+      <div class="step" data-n="2"><h3>Ábrelo con Minecraft</h3><p>Se importan ambos packs automáticamente.</p></div>
+      <div class="step" data-n="3"><h3>Actívalos en el mundo</h3><p>Resource Packs + Behavior Packs → Hide and Seek Monster.</p></div>
+      <div class="step" data-n="4"><h3>Juega de noche</h3><p><code>/time set night</code> o espera al ciclo natural.</p></div>
+    </div>
+
+    <h3 style="margin-top:1.8rem;margin-bottom:.5rem;">Comandos útiles</h3>
+    <div class="cmd-block">/time set night</div>
+    <div class="cmd-block">/summon hide:seek_monster</div>
+    <div class="cmd-block">/summon hide:boss_monster</div>
+    <div class="cmd-block">/give @s hide:bear_trap_item 5</div>
+    <div class="cmd-block">/give @s hide:lantern</div>
+  </section>
+
+  <footer>
+    <p style="font-family:Creepster,cursive;font-size:1.4rem;color:var(--red);">Hide &amp; Seek Monster</p>
+    <p style="margin-top:.4rem;">Add-on fan-made para Minecraft Bedrock · No oficial</p>
+    <p style="margin-top:.8rem;font-size:.8rem;">Minecraft es marca de Mojang / Microsoft.</p>
+  </footer>
+</body>
+</html>
